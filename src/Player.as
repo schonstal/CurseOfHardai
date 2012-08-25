@@ -8,6 +8,10 @@ package
     private var _gravity:Number = 800; 
 
     private var _jumpPressed:Boolean = false;
+    private var _grounded:Boolean = false;
+
+    private var _groundedTimer:Number = 0;
+    private var _groundedThreshold:Number = 0.07;
     
     private var currentRed:uint = 0;
     private var currentBlue:uint = 255;
@@ -18,8 +22,6 @@ package
     private var jumpTimer:Number = 0;
     private var jumpThreshold:Number = 0.1;
 
-    private var wallLockTimer:Number = 0;
-    private var wallLockThreshold:Number = 0.15;
 
     public static const WALL_LEFT:uint = 1 << 1;
     public static const WALL_RIGHT:uint = 1 << 2;
@@ -39,7 +41,7 @@ package
       height = 16;
 
       _speed = new FlxPoint();
-      _speed.y = 400;
+      _speed.y = 250;
       _speed.x = 1000;
 
       acceleration.y = _gravity;
@@ -59,54 +61,38 @@ package
         _jumpPressed = false;
       }
 
-      if(collidesWith(WALL&~(WALL_UP))) {
-        setLockedToWall(collisionFlags);
-      }
-
       if(collidesWith(WALL_UP)) {
-        lockedToFlags = 0;
         maxVelocity.x = 200;
+        _grounded = true;
+        _groundedTimer = 0;
+      } else {
+        _groundedTimer += FlxG.elapsed;
+        if(_groundedTimer >= _groundedThreshold) {
+          _grounded = false;
+        }
       }
 
-      if(lockedToWall(WALL)) {
+
+      if(FlxG.keys.A) {
+        acceleration.x = -_speed.x * (velocity.x > 0 ? 4 : 1);
+      } else if(FlxG.keys.D) {
+        acceleration.x = _speed.x * (velocity.x < 0 ? 4 : 1);
+      } else if (Math.abs(velocity.x) < 50) {
         velocity.x = 0;
         acceleration.x = 0;
-        if((lockedToWall(WALL_RIGHT) && FlxG.keys.D) || (lockedToWall(WALL_LEFT) && FlxG.keys.A)) {
-          wallLockTimer += FlxG.elapsed;
-          if(wallLockTimer > wallLockThreshold) {
-            lockedToFlags = 0;
-          }
-        }
       } else {
-        wallLockTimer = 0;;
-        if(FlxG.keys.A) {
-          acceleration.x = -_speed.x * (velocity.x > 0 ? 4 : 1);
-        } else if(FlxG.keys.D) {
-          acceleration.x = _speed.x * (velocity.x < 0 ? 4 : 1);
-        } else if (Math.abs(velocity.x) < 50) {
-          velocity.x = 0;
-          acceleration.x = 0;
-        } else {
-          var drag:Number = 3;
-          if(!collidesWith(WALL)) {
-            drag = 0;
-          } 
-          if (velocity.x > 0) {
-            acceleration.x = -_speed.x * drag;
-          } else if (velocity.x < 0) {
-            acceleration.x = _speed.x * drag;
-          }
+        var drag:Number = 3;
+        if (velocity.x > 0) {
+          acceleration.x = -_speed.x * drag;
+        } else if (velocity.x < 0) {
+          acceleration.x = _speed.x * drag;
         }
       }
 
       if(_jumpPressed) {
-          if(lockedToWall(WALL)) {
+          if(_grounded) {
             velocity.y = -_speed.y;
             _jumpPressed = false;
-          }
-          if(lockedToWall(WALL_LEFT|WALL_RIGHT)) {
-            velocity.x = (lockedToWall(WALL_LEFT) ? -jumpAmount : jumpAmount);
-            lockedToFlags = 0;
           }
       }
 
@@ -131,14 +117,6 @@ package
 
     public function setCollidesWith(bits:uint):void {
       collisionFlags |= bits;
-    }
-
-    public function setLockedToWall(bits:uint):void {
-      lockedToFlags |= bits;
-    }
-
-    public function lockedToWall(bits:uint):Boolean {
-      return (lockedToFlags & bits) > 0;
     }
 
     public function collidesWith(bits:uint):Boolean {
