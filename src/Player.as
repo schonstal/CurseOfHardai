@@ -109,6 +109,8 @@ package
       else
         acceleration.y = _gravity;
 
+      if(y > FlxG.camera.height) (FlxG.state as PlayState).endLevel();
+
       super.update();
     }
 

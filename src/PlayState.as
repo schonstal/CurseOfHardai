@@ -9,7 +9,7 @@ package
     private var levelGroup:LevelGroup;
 
     override public function create():void {
-      player = new Player(16,FlxG.camera.height-32);
+      player = new Player(16,FlxG.camera.height-120);
       add(player);
 
       levelGroup = new LevelGroup();
@@ -30,6 +30,7 @@ package
     public function endLevel(success:Boolean=false):void {
       FlxG.level++;
       FlxG.log("butts");
+      FlxG.switchState(new PlayState());
     }
   }
 }
