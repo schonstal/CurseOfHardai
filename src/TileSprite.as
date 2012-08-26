@@ -9,7 +9,7 @@ package
     public function TileSprite(X:Number, Y:Number):void {
       super(X,Y);
       immovable = true;
-      makeGraphic(16, 16, 0xff2222cc);
+      loadGraphic(Assets.TileSet, true, false, 16, 16, false);
     }
 
     public function addOnCollisionCallback(callback:Function):void {

@@ -15,7 +15,7 @@ package
       levelGroup = new LevelGroup();
       add(levelGroup);
 
-      FlxG.visualDebug = true;
+      //FlxG.visualDebug = true;
     }
 
     override public function update():void {

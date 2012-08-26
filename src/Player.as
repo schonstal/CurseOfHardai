@@ -51,6 +51,7 @@ package
     }
 
     override public function update():void {
+      if(FlxG.keys.justPressed("SPACE")) FlxG.switchState(new PlayState());
       //Check for jump input, allow for early timing
       jumpTimer += FlxG.elapsed;
       if(FlxG.keys.justPressed("W") || FlxG.keys.justPressed("SPACE") || FlxG.keys.justPressed("UP")) {
