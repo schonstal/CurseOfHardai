@@ -9,6 +9,9 @@ package
 
     private var _jumpPressed:Boolean = false;
     private var _grounded:Boolean = false;
+    private var _jumping:Boolean = false;
+    private var _landing:Boolean = false;
+    private var _justLanded:Boolean = false;
 
     private var _groundedTimer:Number = 0;
     private var _groundedThreshold:Number = 0.07;
@@ -34,11 +37,21 @@ package
 
     public function Player(X:Number,Y:Number):void {
       super(X,Y);
-      //loadGraphic(ImgPlayer, true, true, 16, 20);
-      makeGraphic(16,16,0xffcd7823);
+      loadGraphic(Assets.Player, true, true, 20, 24);
+      addAnimation("idle", [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3], 15, true);
+      addAnimation("run", [6, 7, 8, 9, 10, 11], 15, true);
+      addAnimation("run from landing", [8, 9, 10, 11, 6, 7], 15, true);
+      addAnimation("jump start", [12], 15, true);
+      addAnimation("jump peak", [13], 15, true);
+      addAnimation("jump fall", [14], 15, true);
+      addAnimation("jump land", [15], 15, false);
+      play("idle");
 
       width = 16;
       height = 16;
+
+      offset.x = 4;
+      offset.y = 8;
 
       _speed = new FlxPoint();
       _speed.y = 250;
@@ -48,6 +61,13 @@ package
 
       maxVelocity.y = 400;
       maxVelocity.x = 300;
+    }
+
+    public function playRunAnim():void {
+      if(!_jumping && !_landing) {
+        if(_justLanded) play("run from landing");
+        else play("run");
+      }
     }
 
     override public function update():void {
@@ -64,7 +84,13 @@ package
 
       if(collidesWith(WALL_UP)) {
         maxVelocity.x = 200;
+        if(!_grounded) {
+          play("jump land");
+          _landing = true;
+          _justLanded = true;
+        }
         _grounded = true;
+        _jumping = false;
         _groundedTimer = 0;
       } else {
         _groundedTimer += FlxG.elapsed;
@@ -73,15 +99,27 @@ package
         }
       }
 
+      if(_landing && finished) {
+        _landing = false;
+      }
 
       if(FlxG.keys.A) {
         acceleration.x = -_speed.x * (velocity.x > 0 ? 4 : 1);
+        offset.x = 0;
+        facing = LEFT;
+        playRunAnim();
       } else if(FlxG.keys.D) {
         acceleration.x = _speed.x * (velocity.x < 0 ? 4 : 1);
+        offset.x = 4;
+        facing = RIGHT;
+        playRunAnim();
       } else if (Math.abs(velocity.x) < 50) {
+        if(!_jumping && !_landing) play("idle");
         velocity.x = 0;
         acceleration.x = 0;
+        _justLanded = false;
       } else {
+        _justLanded = false;
         var drag:Number = 3;
         if (velocity.x > 0) {
           acceleration.x = -_speed.x * drag;
@@ -92,10 +130,23 @@ package
 
       if(_jumpPressed) {
           if(_grounded) {
+            play("jump start");
+            _jumping = true;
             velocity.y = -_speed.y;
             _jumpPressed = false;
           }
       }
+
+      if(velocity.y < -1) {
+        if(jumpPressed() && velocity.y > -100) {
+          play("jump peak");
+        }
+      } else if (velocity.y > 1) {
+        if(velocity.y > 100) {
+          play("jump fall");
+        }
+      }
+
 
       if(FlxG.keys.LEFT) {
         jumpAmount--;
@@ -104,7 +155,7 @@ package
         jumpAmount++;
       }
           
-      if(!(FlxG.keys.W || FlxG.keys.SPACE || FlxG.keys.UP) && velocity.y < 0)
+      if(!jumpPressed() && velocity.y < 0)
         acceleration.y = _gravity * 3;
       else
         acceleration.y = _gravity;
@@ -112,6 +163,10 @@ package
       if(y > FlxG.camera.height) (FlxG.state as PlayState).endLevel();
 
       super.update();
+    }
+
+    public function jumpPressed():Boolean {
+      return FlxG.keys.W || FlxG.keys.SPACE || FlxG.keys.UP;
     }
 
     public function resetFlags():void {
