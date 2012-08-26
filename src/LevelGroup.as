@@ -23,8 +23,6 @@ package
     public function LevelGroup(roomType:Number=0) {
       init(roomType);
 
-      var goal:GoalSprite = new GoalSprite(336, FlxG.camera.height - 32);
-      add(goal);
     }
 
     public function reporoduce(mother:Array, father:Array):void {
@@ -60,6 +58,7 @@ package
 
       //Lay down bricks for empty area
       var topThickness:Number = 3;
+      var bottomThickness:Number = 4;
       var y:int = 1; //Fuck AS3
 
       for(var x:int = 0; x < tiles[0].length; x++) {
@@ -72,6 +71,19 @@ package
           else if(topThickness <= 2) topThickness++;
           else if(Math.random() <= 0.5) topThickness--;
           else topThickness++;
+        }
+      }
+
+      for(x = 0; x < tiles[0].length; x++) {
+        for(y = tiles.length-1; y >= tiles.length - bottomThickness; y--) {
+          if(tiles[y][x] != -1) break;
+          tiles[y][x] = FEATURES.WALL;
+        }
+        if(Math.random() <= 0.2 && x < tiles[0].length - 4) {
+          if(bottomThickness >= 5) bottomThickness--;
+          else if(bottomThickness <= 3) bottomThickness++;
+          else if(Math.random() <= 0.5) bottomThickness--;
+          else bottomThickness++;
         }
       }
 
@@ -88,6 +100,15 @@ package
         }
       }
 
+      //Add the goal
+      for (var n:Number = tiles.length - 1; n > 1; n--) {
+        if(tiles[n][tiles[n].length-3] == -1) {
+          var goal:GoalSprite = new GoalSprite(352, 16*n);
+          add(goal);
+          break;
+        }
+      }
+
       for each(var a:Array in tiles) {
         FlxG.log("[" + a + "]");
       }
@@ -96,18 +117,23 @@ package
 
     public function initializePits():void {
       var tileIndex:Number = 7;
-      var digLength:Number = 3;
+      var digLength:Number = 0;
       var digMax:Number = 7;
 
       for(var x:int = 3; x < tiles[tileIndex].length - 3; x++) {
-        if(digLength <= digMax || Math.random() <= 0.3) {
+        if(digLength <= digMax && Math.random() <= 0.3) {
           digLength++;
-          for(var y:int = tileIndex; y < tiles.length; y++) {
-            tiles[y][x] = FEATURES.PIT;
-          }
+          for(var y:int = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
         } else {
+          if(digLength > 0 && digLength < 3) {
+            digLength++;
+            for(var y:int = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
+          } else {
+            digLength = 0;
+          }
         }
       }
     }
+
   }
 }
