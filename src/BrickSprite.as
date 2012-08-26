@@ -7,8 +7,8 @@ package
     public function BrickSprite(X:Number, Y:Number):void {
       super(X,Y);
       immovable = true;
-      makeGraphic(16, 16, FlxU.makeColorFromHSB(FlxG.level * 120 % 360, 0.8, 0.8));
       addOnCollisionCallback(setPlayerFlags);
+      frame = Math.random() < 0.5 ? 0 : 1;
     }
 
     public function setPlayerFlags(player:Player):void {
