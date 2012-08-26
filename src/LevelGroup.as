@@ -11,18 +11,24 @@ package
     };
 
     private var tiles:Array;
+    private var background:FlxGroup;
 
     public static const FEATURES:Object = {
       WALL:   0,
       SQUARE: 1,
-      PIT:    2
+      PIT:    2,
+      BOX_1:  3,
+      BOX_2:  4,
+      BOX_3:  5,
+      BOX_4:  6
     }
 
     public static const TILE_SIZE:Number = 16;
 
     public function LevelGroup(roomType:Number=0) {
+      background = new FlxGroup();
+      add(background);
       init(roomType);
-
     }
 
     public function reporoduce(mother:Array, father:Array):void {
@@ -96,6 +102,8 @@ package
             brick.allowCollisions = FlxObject.LEFT | FlxObject.RIGHT;
             if(y > 0 && tiles[y-1][x] != 0) brick.allowCollisions |= FlxObject.UP;
             add(brick);
+          } else {
+            background.add((recycle(WallSprite) as WallSprite).init(x*TILE_SIZE, y*TILE_SIZE, 0));
           }
         }
       }
@@ -109,10 +117,13 @@ package
         }
       }
 
-      for each(var a:Array in tiles) {
-        FlxG.log("[" + a + "]");
-      }
-      FlxG.log("------");
+      //lol eyes
+      //var s:FlxSprite = new FlxSprite(336, 16*5);
+      //s.makeGraphic(16,16,0xff33cccc);
+      //add(s);
+      //s = new FlxSprite(368, 16*5);
+      //s.makeGraphic(16,16,0xff33cccc);
+      //add(s);
     }
 
     public function initializePits():void {
@@ -121,7 +132,7 @@ package
       var digMax:Number = 7;
 
       for(var x:int = 3; x < tiles[tileIndex].length - 3; x++) {
-        if(digLength <= digMax && Math.random() <= 0.3) {
+        if(digLength <= digMax && Math.random() <= 0.3 && !(digLength == 0 && x >= tiles[0].length - 4)) {
           digLength++;
           for(var y:int = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
         } else {

@@ -34,8 +34,7 @@ package
 
     public function Player(X:Number,Y:Number):void {
       super(X,Y);
-      //loadGraphic(ImgPlayer, true, true, 16, 20);
-      makeGraphic(16,16,0xffcd7823);
+      loadGraphic(Assets.Player, true, true, 16, 16);
 
       width = 16;
       height = 16;

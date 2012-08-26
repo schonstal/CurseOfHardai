@@ -9,11 +9,16 @@ package
     private var levelGroup:LevelGroup;
 
     override public function create():void {
-      player = new Player(16,FlxG.camera.height-120);
-      add(player);
-
       levelGroup = new LevelGroup();
       add(levelGroup);
+
+      if(!G.playedMusic) {
+        FlxG.playMusic(Assets.GameMusic);
+        G.playedMusic = true;
+      }
+
+      player = new Player(16,FlxG.camera.height-120);
+      add(player);
 
       //FlxG.visualDebug = true;
     }
