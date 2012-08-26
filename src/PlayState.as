@@ -17,7 +17,7 @@ package
         G.playedMusic = true;
       }
 
-      player = new Player(16,FlxG.camera.height-120);
+      player = new Player(18,FlxG.camera.height-120);
       add(player);
 
       //FlxG.visualDebug = true;
