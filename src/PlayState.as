@@ -24,12 +24,12 @@ package
     }
 
     override public function update():void {
+      super.update();
       player.resetFlags();
 
       FlxG.collide(player, levelGroup, function(player:Player, tile:TileSprite):void {
         tile.onCollide(player);
       });
-      super.update();
     }
 
     public function endLevel(success:Boolean=false):void {
