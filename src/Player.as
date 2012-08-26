@@ -40,10 +40,11 @@ package
       loadGraphic(Assets.Player, true, true, 20, 24);
       addAnimation("idle", [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3], 15, true);
       addAnimation("run", [6, 7, 8, 9, 10, 11], 15, true);
-      addAnimation("jump start", [6], 15, true);
-      addAnimation("jump peak", [8], 15, true);
-      addAnimation("jump fall", [10], 15, true);
-      addAnimation("jump land", [1], 15, false);
+      addAnimation("run from landing", [8, 9, 10, 11, 6, 7], 15, true);
+      addAnimation("jump start", [12], 15, true);
+      addAnimation("jump peak", [13], 15, true);
+      addAnimation("jump fall", [14], 15, true);
+      addAnimation("jump land", [15], 15, false);
       play("idle");
 
       width = 16;
@@ -62,6 +63,13 @@ package
       maxVelocity.x = 300;
     }
 
+    public function playRunAnim():void {
+      if(!_jumping && !_landing) {
+        if(_justLanded) play("run from landing");
+        else play("run");
+      }
+    }
+
     override public function update():void {
       if(FlxG.keys.justPressed("SPACE")) FlxG.switchState(new PlayState());
       //Check for jump input, allow for early timing
@@ -77,9 +85,9 @@ package
       if(collidesWith(WALL_UP)) {
         maxVelocity.x = 200;
         if(!_grounded) {
-          color = 0xff33ff33;
           play("jump land");
           _landing = true;
+          _justLanded = true;
         }
         _grounded = true;
         _jumping = false;
@@ -92,7 +100,6 @@ package
       }
 
       if(_landing && finished) {
-        color = 0xffffffff;
         _landing = false;
       }
 
@@ -100,17 +107,19 @@ package
         acceleration.x = -_speed.x * (velocity.x > 0 ? 4 : 1);
         offset.x = 0;
         facing = LEFT;
-        if(!_jumping && !_landing) play("run");
+        playRunAnim();
       } else if(FlxG.keys.D) {
         acceleration.x = _speed.x * (velocity.x < 0 ? 4 : 1);
         offset.x = 4;
         facing = RIGHT;
-        if(!_jumping && !_landing) play("run");
+        playRunAnim();
       } else if (Math.abs(velocity.x) < 50) {
         if(!_jumping && !_landing) play("idle");
         velocity.x = 0;
         acceleration.x = 0;
+        _justLanded = false;
       } else {
+        _justLanded = false;
         var drag:Number = 3;
         if (velocity.x > 0) {
           acceleration.x = -_speed.x * drag;
