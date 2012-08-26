@@ -10,7 +10,7 @@ package
       3: [BrickSprite]
     };
 
-    var tiles:Array;
+    private var tiles:Array = [];
 
     public function LevelGroup() {
       var brick:BrickSprite;
@@ -43,6 +43,9 @@ package
       brick = new BrickSprite(176, FlxG.camera.height - 48);
       brick.allowCollisions = FlxObject.LEFT | FlxObject.RIGHT | FlxObject.UP;
       add(brick);
+
+      var goal:GoalSprite = new GoalSprite(336, FlxG.camera.height - 32);
+      add(goal);
     }
   }
 }

@@ -6,10 +6,10 @@ package
   {
     public var player:Player;
 
-    public var levelGroup:LevelGroup;
+    private var levelGroup:LevelGroup;
 
     override public function create():void {
-      player = new Player(15,15);
+      player = new Player(16,FlxG.camera.height-32);
       add(player);
 
       levelGroup = new LevelGroup();
@@ -25,6 +25,11 @@ package
         tile.onCollide(player);
       });
       super.update();
+    }
+
+    public function endLevel(success:Boolean=false):void {
+      FlxG.level++;
+      FlxG.log("butts");
     }
   }
 }
