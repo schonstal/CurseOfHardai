@@ -10,7 +10,7 @@ package
     }
 
     public function init(X:Number, Y:Number, colorIndex:int):WallSprite {
-      frame = (Math.random() < 0.33 ? 7 : 6) + 7*colorIndex;
+      frame = (Math.random() < 0.33 ? 7 : 6) + 8*colorIndex;
       x = X;
       y = Y;
 

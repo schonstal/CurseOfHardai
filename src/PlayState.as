@@ -9,7 +9,7 @@ package
     private var levelGroup:LevelGroup;
 
     override public function create():void {
-      levelGroup = new LevelGroup();
+      levelGroup = new LevelGroup(Math.floor(Math.random() * 2.999));
       add(levelGroup);
 
       if(!G.playedMusic) {

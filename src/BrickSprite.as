@@ -4,11 +4,11 @@ package
 
   public class BrickSprite extends TileSprite
   {
-    public function BrickSprite(X:Number, Y:Number):void {
+    public function BrickSprite(X:Number, Y:Number, colorIndex:int):void {
       super(X,Y);
       immovable = true;
       addOnCollisionCallback(setPlayerFlags);
-      frame = Math.random() < 0.5 ? 0 : 1;
+      frame = (Math.random() < 0.5 ? 0 : 1) + 8*colorIndex;
     }
 
     public function setPlayerFlags(player:Player):void {
