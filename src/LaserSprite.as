@@ -13,7 +13,7 @@ package
       loadGraphic(Assets.Laser, true, false, 16, 240, false);
 
       addAnimation("idle", [1], 15, false);
-      addAnimation("tripped", [0, 1, 0, 1, 0, 1, 0, 0, 0], 30, false);
+      addAnimation("tripped", [0, 1, 0, 1, 0, 0], 20, false);
       addAnimation("on", [2, 3, 2, 3, 2, 3, 2, 3], 15, false);
       addAnimation("cool down", [4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 10, false);
 
@@ -28,8 +28,9 @@ package
     }
 
     public function activationSequence(title:String, frameIndex:uint, frame:uint):void {
-      if(title == "tripped" && frameIndex == 8) {
+      if(title == "tripped" && frameIndex == 5) {
         play("on");
+        FlxG.play(Assets.LaserSound);
       } else if(title == "on") {
         _active = true;
         if(frameIndex == 7) {

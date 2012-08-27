@@ -9,5 +9,7 @@ package
     [Embed(source = "../data/laser.png")] public static var Laser:Class;
 
     [Embed(source = "../data/music/game.mp3")] public static var GameMusic:Class;
+    [Embed(source = "../data/jump.mp3")] public static var JumpSound:Class;
+    [Embed(source = "../data/laser.mp3")] public static var LaserSound:Class;
   }
 }

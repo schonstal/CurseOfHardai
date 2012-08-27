@@ -130,6 +130,7 @@ package
 
       if(_jumpPressed) {
           if(_grounded) {
+            FlxG.play(Assets.JumpSound);
             play("jump start");
             _jumping = true;
             velocity.y = -_speed.y;

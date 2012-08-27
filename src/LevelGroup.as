@@ -42,7 +42,16 @@ package
       clearGroups();
       if(!shell) init(roomType);
 
+      lasers.add(new LaserSprite(3,5));
       lasers.add(new LaserSprite(5,5));
+      lasers.add(new LaserSprite(7,5));
+      lasers.add(new LaserSprite(8,5));
+      lasers.add(new LaserSprite(9,5));
+      lasers.add(new LaserSprite(12,5));
+      lasers.add(new LaserSprite(14,5));
+      lasers.add(new LaserSprite(15,5));
+      lasers.add(new LaserSprite(17,5));
+      lasers.add(new LaserSprite(18,5));
     }
 
     public function clearGroups():void {
