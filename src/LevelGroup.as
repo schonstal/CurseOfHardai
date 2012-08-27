@@ -222,27 +222,31 @@ package
       var y:int = 1;
       var gun:GunSprite;
       var safe:Boolean = false;
+      var generated:Boolean = false;
 
-      for(var x:int = 3; x < tiles[0].length - 6; x++) {
-        for(y = 3; y < tiles.length - 4; y++) {
-          if(tiles[y][x] != -1) {
-            continue;
-          } else if (Math.random() < 0.075) {
-            safe = true;
-            tileRange(x, y, 3, 3, function(j:int, k:int):void {
-              if(tiles[k][j] != -1) {
-                safe = false;
+      do {
+        for(var i:int = 0; i < 3; i++) {
+          generated = false;
+          tileRange(3 + i*(i == 2 ? 5 : 6), 4, 6, 8, function(x:int, y:int):void {
+            if (Math.random() < 0.0125 && !generated) {
+              if(tiles[y][x] != -1) return;
+                safe = true;
+                tileRange(x, y, 3, 3, function(j:int, k:int):void {
+                  if(tiles[k][j] != -1) {
+                    safe = false;
+                  }
+                });
+                if(safe) {
+                  tileRange(x, y, 3, 3, function(j:int, k:int):void {
+                    tiles[k][j] = FEATURES.GUN;
+                  });
+                  gunTiles.push(new GunSprite(x+1, y+1, bullets));
+                  generated = true;
+                }
               }
-            });
-            if(safe) {
-              tileRange(x, y, 3, 3, function(j:int, k:int):void {
-                tiles[k][j] = FEATURES.GUN;
-              });
-              gunTiles.push(new GunSprite(x+1, y+1, bullets));
-            }
-          }
+          });
         }
-      }
+      } while(gunTiles.length == 0)
 
       for each(gun in gunTiles) {
         guns.add(gun);
