@@ -57,7 +57,7 @@ package
         play("tripped");
         _idle = false;
       } else if(_active) {
-        (FlxG.state as PlayState).endLevel();
+        (FlxG.state as PlayState).die();
       }
     }
   }
