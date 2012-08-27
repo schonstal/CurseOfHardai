@@ -47,6 +47,16 @@ package
       FlxG.overlap(player, levelGroup.lasers, function(player:Player, tile:TileSprite):void {
         tile.onCollide(player);
       });
+
+      FlxG.overlap(player, levelGroup.bullets, function(player:Player, bullet:BulletSprite):void {
+        endLevel();
+        bullet.onCollide();
+      });
+
+      FlxG.overlap(levelGroup.bricks, levelGroup.bullets,
+          function(brick:BrickSprite, bullet:BulletSprite):void {
+            bullet.onCollide();
+          });
     }
 
     public function endLevel(success:Boolean=false):void {

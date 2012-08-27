@@ -68,22 +68,22 @@ package
       } else {
         var speed:Number = BulletSprite.SPEED * 0.7;
         bullet = bullets.recycle(BulletSprite) as BulletSprite;
-        bullet.init(x-7, y-7);
+        bullet.init(x-5, y-5);
         bullet.velocity.y = -speed;
         bullet.velocity.x = -speed;
 
         bullet = bullets.recycle(BulletSprite) as BulletSprite;
-        bullet.init(x-7, y+17);
+        bullet.init(x-5, y+15);
         bullet.velocity.y = speed;
         bullet.velocity.x = -speed;
 
         bullet = bullets.recycle(BulletSprite) as BulletSprite;
-        bullet.init(x+17, y-7);
+        bullet.init(x+15, y-5);
         bullet.velocity.y = -speed;
         bullet.velocity.x = speed;
 
         bullet = bullets.recycle(BulletSprite) as BulletSprite;
-        bullet.init(x+17, y+17);
+        bullet.init(x+15, y+15);
         bullet.velocity.y = speed;
         bullet.velocity.x = speed;
       }
