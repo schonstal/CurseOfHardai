@@ -11,6 +11,8 @@ package
     };
 
     private var tiles:Array;
+   
+    public var fitness:Number = 1;
 
     //genetic information
     public var laserTiles:Array;
@@ -18,7 +20,6 @@ package
     public var brickTiles:Object;
     public var bgTiles:Object;
     public var pits:Array;
-    
 
     public var bg:FlxGroup;
     public var lasers:FlxGroup;
@@ -39,6 +40,7 @@ package
     public static const TILE_SIZE:Number = 16;
 
     public function LevelGroup(roomType:Number=0, shell:Boolean = false) {
+      bullets = new FlxGroup();
       clearGroups();
       if(!shell) init(roomType);
 
@@ -53,10 +55,14 @@ package
         remove(bricks);
       }
 
+      for each(var sprite:BulletSprite in bullets.members) {
+        sprite.exists = false;
+        sprite.velocity.x = sprite.velocity.y = 0;
+      }
+
       bg = new FlxGroup();
       lasers = new FlxGroup();
       guns = new FlxGroup();
-      bullets = new FlxGroup();
       bricks = new FlxGroup();
 
       add(bg);
@@ -150,7 +156,7 @@ package
           if(tiles[y][x] != -1) break;
           tiles[y][x] = FEATURES.WALL;
         }
-        if(Math.random() <= 0.2 && x < tiles[0].length - 4) {
+        if(x >= 2 && Math.random() <= 0.2 && x < tiles[0].length - 4) {
           if(bottomThickness >= 5) bottomThickness--;
           else if(bottomThickness <= 3) bottomThickness++;
           else if(Math.random() <= 0.5) bottomThickness--;
@@ -178,7 +184,7 @@ package
       //Add the goal
       for (var n:Number = tiles.length - 1; n > 1; n--) {
         if(tiles[n][tiles[n].length-3] == -1) {
-          var goal:GoalSprite = new GoalSprite(22, n);
+          goal = new GoalSprite(22, n);
           add(goal);
           break;
         }
@@ -262,7 +268,8 @@ package
           callback(x, y);
     }
 
-    public function addGun():void {
+    public override function update():void {
+      if(!G.paused) super.update();
     }
 
     public function initializePits():void {
@@ -286,5 +293,18 @@ package
       }
     }
 
+    //reset all the tiles
+    public function rebase():void {
+      for each(var sprite:BulletSprite in bullets.members) {
+        sprite.exists = false;
+        sprite.velocity.x = sprite.velocity.y = 0;
+      }
+      for each(var laserSprite:LaserSprite in laserTiles) {
+        laserSprite.init(laserSprite.tileX, laserSprite.tileY);
+      }
+      for each(var gunSprite:GunSprite in gunTiles) {
+        gunSprite.init(gunSprite.tileX, gunSprite.tileY, bullets);
+      }
+    }
   }
 }

@@ -5,11 +5,13 @@ package
   public class PlayState extends FlxState
   {
     public var player:Player;
+    public var teleporter:TeleporterSprite;
 
     private var levelGroup:LevelGroup;
 
     private var currentGeneration:Array;
     private var nextGeneration:Array;
+    private var tempGeneration:Array;
 
     override public function create():void {
       currentGeneration = new Array();
@@ -22,7 +24,14 @@ package
       if(FlxG.level == 0) levelGroup = motherGroup;
       else if(FlxG.level == 1) levelGroup = fatherGroup;*/
 
-      levelGroup = new LevelGroup(Math.floor(Math.random()*2.99));
+      for(var i:int = 0; i < 9; i++) {
+        levelGroup = new LevelGroup(i%3);
+        currentGeneration.push(levelGroup);
+
+        levelGroup = new LevelGroup(-1, false);
+        nextGeneration.push(levelGroup);
+      }
+      levelGroup = currentGeneration[0]
       add(levelGroup);
 
       if(!G.playedMusic) {
@@ -30,39 +39,87 @@ package
         G.playedMusic = true;
       }
 
-      player = new Player(18,FlxG.camera.height-120);
-      add(player);
+      player = new Player(18,160);
+
+      teleporter = new TeleporterSprite(18, player.y);
+      add(teleporter);
+
+      G.paused = true;
 
       //FlxG.visualDebug = true;
     }
 
     override public function update():void {
+      if(FlxG.keys.justPressed("SPACE")) FlxG.switchState(new PlayState());
       super.update();
-      player.resetFlags();
+      if(!G.paused) {
+        player.resetFlags();
 
-      FlxG.collide(player, levelGroup.bricks, function(player:Player, tile:TileSprite):void {
-        tile.onCollide(player);
-      });
+        FlxG.collide(player, levelGroup.bricks, function(player:Player, tile:TileSprite):void {
+          tile.onCollide(player);
+        });
 
-      FlxG.overlap(player, levelGroup.lasers, function(player:Player, tile:TileSprite):void {
-        tile.onCollide(player);
-      });
+        FlxG.overlap(player, levelGroup.lasers, function(player:Player, tile:TileSprite):void {
+          tile.onCollide(player);
+        });
 
-      FlxG.overlap(player, levelGroup.bullets, function(player:Player, bullet:BulletSprite):void {
-        endLevel();
-        bullet.onCollide();
-      });
+        FlxG.overlap(player, levelGroup.goal, function(player:Player, tile:TileSprite):void {
+          tile.onCollide(player);
+        });
 
-      FlxG.overlap(levelGroup.bricks, levelGroup.bullets,
-          function(brick:BrickSprite, bullet:BulletSprite):void {
-            bullet.onCollide();
-          });
+        FlxG.overlap(player, levelGroup.bullets, function(player:Player, bullet:BulletSprite):void {
+          die();
+          bullet.onCollide();
+        });
+
+        FlxG.overlap(levelGroup.bricks, levelGroup.bullets,
+            function(brick:BrickSprite, bullet:BulletSprite):void {
+              bullet.onCollide();
+            });
+      }
     }
 
-    public function endLevel(success:Boolean=false):void {
-      if(success) FlxG.level++;
-      FlxG.log("butts");
-      FlxG.switchState(new PlayState());
+    public function makeLevelsFuck():void {
+    }
+
+    public function die():void {
+      G.paused = true;
+      teleportIn();
+      levelGroup.rebase();
+    }
+
+    public function teleportOut():void {
+      remove(player);
+      teleporter.init(player.x, player.y);
+      teleporter.play("go", true);
+    }
+    
+    public function teleportIn():void {
+      remove(player);
+      teleporter.init(Player.START_X, Player.START_Y);
+      teleporter.play("return", true);
+    }
+
+    public function startLevel():void {
+      FlxG.log("starting " + FlxG.level);
+      player = new Player(Player.START_X, Player.START_Y);
+      add(player);
+      G.paused = false;
+      levelGroup.rebase();
+    }
+
+    public function endLevel():void {
+      FlxG.log("ending " + FlxG.level)
+      FlxG.level++;
+      if(FlxG.level <= 8) {
+        remove(levelGroup);
+        levelGroup = currentGeneration[FlxG.level];
+        add(levelGroup);
+        teleportIn();
+      } else {
+        FlxG.level = 0;
+        //Do mating
+      }
     }
   }
 }
