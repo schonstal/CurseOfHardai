@@ -86,6 +86,10 @@ package
 
       //when copying tiles copy tiles from near the copied thing
 
+      copyGuns();
+      copyLasers();
+      copyPits();
+
       var x:int;
       var y:int;
       var level:LevelGroup;
@@ -93,14 +97,25 @@ package
         for(x = 0; x < 25; x++) {
           level = Math.random() > 0.5 ? mother : father;
           if(level.brickTiles[cacheKey(x,y)] != null) {
+            brickTiles[cacheKey(x,y)] = level.brickTiles[cacheKey(x,y)];
             add(level.brickTiles[cacheKey(x,y)]);
           } else {
+            bgTiles[cacheKey(x,y)] = level.bgTiles[cacheKey(x,y)];
             add(level.bgTiles[cacheKey(x,y)]);
           }
         }
       }
 
       return this;
+    }
+
+    public function copyGuns():void {
+    }
+
+    public function copyLasers():void {
+    }
+
+    public function copyPits():void {
     }
 
     public function cacheKey(X:Number, Y:Number):String {
