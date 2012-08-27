@@ -54,6 +54,7 @@ package
     }
 
     public function init(roomType:Number):void {
+      FlxG.log(roomType);
       tiles = emptyRoom();
 
       if(roomType == 0) {
@@ -98,12 +99,12 @@ package
         for(x = 0; x < tiles[0].length; x++) {
           //LAY THOSE BRICKS DOWN
           if(tiles[y][x] == FEATURES.WALL) {
-            brick = new BrickSprite(x*TILE_SIZE, y*TILE_SIZE);
+            brick = new BrickSprite(x*TILE_SIZE, y*TILE_SIZE, roomType);
             brick.allowCollisions = FlxObject.LEFT | FlxObject.RIGHT;
             if(y > 0 && tiles[y-1][x] != 0) brick.allowCollisions |= FlxObject.UP;
             add(brick);
           } else {
-            background.add((recycle(WallSprite) as WallSprite).init(x*TILE_SIZE, y*TILE_SIZE, 0));
+            background.add((recycle(WallSprite) as WallSprite).init(x*TILE_SIZE, y*TILE_SIZE, roomType));
           }
         }
       }

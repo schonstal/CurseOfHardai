@@ -38,7 +38,7 @@ package
     public function Player(X:Number,Y:Number):void {
       super(X,Y);
       loadGraphic(Assets.Player, true, true, 20, 24);
-      addAnimation("idle", [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3], 15, true);
+      addAnimation("idle", [0, 0, 0, 0, 0, 0, 1, 2, 3], 15, true);
       addAnimation("run", [6, 7, 8, 9, 10, 11], 15, true);
       addAnimation("run from landing", [8, 9, 10, 11, 6, 7], 15, true);
       addAnimation("jump start", [12], 15, true);
@@ -47,10 +47,10 @@ package
       addAnimation("jump land", [15], 15, false);
       play("idle");
 
-      width = 16;
+      width = 14;
       height = 16;
 
-      offset.x = 4;
+      offset.x = 5;
       offset.y = 8;
 
       _speed = new FlxPoint();
@@ -105,12 +105,12 @@ package
 
       if(FlxG.keys.A) {
         acceleration.x = -_speed.x * (velocity.x > 0 ? 4 : 1);
-        offset.x = 0;
+        offset.x = 1;
         facing = LEFT;
         playRunAnim();
       } else if(FlxG.keys.D) {
         acceleration.x = _speed.x * (velocity.x < 0 ? 4 : 1);
-        offset.x = 4;
+        offset.x = 5;
         facing = RIGHT;
         playRunAnim();
       } else if (Math.abs(velocity.x) < 50) {

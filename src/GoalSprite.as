@@ -8,6 +8,7 @@ package
       super(X,Y);
       immovable = true;
       makeGraphic(16, 16, 0xff2222cc);
+      solid = false;
       addOnCollisionCallback(nextLevel);
     }
 
