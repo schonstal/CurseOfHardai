@@ -238,7 +238,7 @@ package
               tileRange(x, y, 3, 3, function(j:int, k:int):void {
                 tiles[k][j] = FEATURES.GUN;
               });
-              gunTiles.push(new GunSprite(x+1, y+1));
+              gunTiles.push(new GunSprite(x+1, y+1, bullets));
             }
           }
         }
