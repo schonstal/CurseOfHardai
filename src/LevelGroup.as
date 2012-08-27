@@ -27,8 +27,6 @@ package
     public var bullets:FlxGroup;
     public var bricks:FlxGroup;
 
-    public var goal:GoalSprite;
-
     public static const FEATURES:Object = {
       WALL:   0,
       SQUARE: 1,
@@ -196,15 +194,6 @@ package
         }
       }
 
-      //Add the goal
-      for (var n:Number = tiles.length - 1; n > 1; n--) {
-        if(tiles[n][tiles[n].length-3] == -1) {
-          goal = new GoalSprite(22, n);
-          add(goal);
-          break;
-        }
-      }
-
       //lol eyes
       //var s:FlxSprite = new FlxSprite(336, 16*5);
       //s.makeGraphic(16,16,0xff33cccc);
@@ -319,6 +308,18 @@ package
       }
       for each(var gunSprite:GunSprite in gunTiles) {
         gunSprite.init(gunSprite.tileX, gunSprite.tileY, bullets);
+      }
+      
+      updateGoal();
+    }
+
+    public function updateGoal():void {
+      //Add the goal
+      for (var n:Number = tiles.length - 1; n > 1; n--) {
+        if(tiles[n][tiles[n].length-3] == -1) {
+          (FlxG.state as PlayState).goal.init(22, n);
+          break;
+        }
       }
     }
   }

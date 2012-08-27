@@ -7,6 +7,8 @@ package
     public var player:Player;
     public var teleporter:TeleporterSprite;
 
+    public var goal:GoalSprite;
+
     private var levelGroup:LevelGroup;
 
     private var currentGeneration:Array;
@@ -16,6 +18,8 @@ package
     override public function create():void {
       currentGeneration = new Array();
       nextGeneration = new Array();
+
+      goal = new GoalSprite(22, 15);
 
       /*var motherGroup:LevelGroup = new LevelGroup(2);
       var fatherGroup:LevelGroup = new LevelGroup(0);
@@ -45,6 +49,8 @@ package
       add(teleporter);
 
       G.paused = true;
+      levelGroup.updateGoal();
+      add(goal);
 
       //FlxG.visualDebug = true;
     }
@@ -63,7 +69,7 @@ package
           tile.onCollide(player);
         });
 
-        FlxG.overlap(player, levelGroup.goal, function(player:Player, tile:TileSprite):void {
+        FlxG.overlap(player, goal, function(player:Player, tile:TileSprite):void {
           tile.onCollide(player);
         });
 
@@ -134,6 +140,7 @@ package
     
     public function teleportIn():void {
       remove(player);
+      levelGroup.updateGoal();
       teleporter.init(Player.START_X, Player.START_Y);
       teleporter.play("return", true);
     }
@@ -143,7 +150,6 @@ package
       player = new Player(Player.START_X, Player.START_Y);
       add(player);
       G.paused = false;
-      levelGroup.rebase();
     }
 
     public function endLevel():void {
@@ -151,15 +157,21 @@ package
       FlxG.level++;
       if(FlxG.level <= 8) {
         remove(levelGroup);
+        remove(goal);
         levelGroup = currentGeneration[FlxG.level];
+        levelGroup.rebase();
         add(levelGroup);
+        add(goal);
         teleportIn();
       } else {
         remove(levelGroup);
+        remove(goal);
         FlxG.level = 0;
         mateLevels();
         levelGroup = currentGeneration[FlxG.level];
+        levelGroup.rebase();
         add(levelGroup);
+        add(goal);
         teleportIn();
       }
     }
