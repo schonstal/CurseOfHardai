@@ -42,16 +42,6 @@ package
       clearGroups();
       if(!shell) init(roomType);
 
-      lasers.add(new LaserSprite(3,5));
-      lasers.add(new LaserSprite(5,5));
-      lasers.add(new LaserSprite(7,5));
-      lasers.add(new LaserSprite(8,5));
-      lasers.add(new LaserSprite(9,5));
-      lasers.add(new LaserSprite(12,5));
-      lasers.add(new LaserSprite(14,5));
-      lasers.add(new LaserSprite(15,5));
-      lasers.add(new LaserSprite(17,5));
-      lasers.add(new LaserSprite(18,5));
     }
 
     public function clearGroups():void {
@@ -139,7 +129,7 @@ package
 
       //Lay down bricks for empty area
       var topThickness:Number = 3;
-      var bottomThickness:Number = 4;
+      var bottomThickness:Number = roomType == 2 ? 3 : 4;
       var y:int = 1; //Fuck AS3
 
       for(var x:int = 0; x < tiles[0].length; x++) {
@@ -148,7 +138,7 @@ package
           tiles[y][x] = FEATURES.WALL;
         }
         if(Math.random() <= 0.2) {
-          if(topThickness >= 4) topThickness--;
+          if(topThickness >= (roomType == 2 ? 3 : 4)) topThickness--;
           else if(topThickness <= 2) topThickness++;
           else if(Math.random() <= 0.5) topThickness--;
           else topThickness++;
@@ -168,8 +158,8 @@ package
         }
       }
       
-      if(roomType == 2) initializeGuns();
-      if(roomType == 1) initializeLasers();
+      if(roomType == 1) initializeGuns();
+      if(roomType == 2) initializeLasers();
 
       for(y = 0; y < tiles.length; y++) {
         for(x = 0; x < tiles[0].length; x++) {
@@ -204,6 +194,27 @@ package
     }
 
     public function initializeLasers():void {
+      var topThickness:Number = 4;
+      var y:int = 1;
+      var laser:LaserSprite;
+
+      for(var x:int = 3; x < tiles[0].length - 3; x++) {
+        for(y = 1; y < topThickness; y++) {
+          if(tiles[y][x] == 0) {
+            continue;
+          } else if (tiles[y][x] == -1) {
+            if(Math.random() < 0.4) {
+              tiles[y][x] = FEATURES.LASER;
+              laserTiles.push(new LaserSprite(x,y));
+            }
+            break;
+          }
+        }
+      }
+
+      for each(laser in laserTiles) {
+        lasers.add(laser);
+      }
     }
 
     public function initializeGuns():void {
