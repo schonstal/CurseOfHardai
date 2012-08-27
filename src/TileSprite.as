@@ -4,12 +4,18 @@ package
 
   public class TileSprite extends FlxSprite
   {
+    public static const WIDTH:Number = 16;
+
+    public var tileX:Number = 0;
+    public var tileY:Number = 0;
+
     private var collisionCallbacks:Array = new Array();
 
     public function TileSprite(X:Number, Y:Number):void {
-      super(X,Y);
+      tileX = X;
+      tileY = Y;
+      super(X*WIDTH,Y*WIDTH);
       immovable = true;
-      loadGraphic(Assets.TileSet, true, false, 16, 16, false);
     }
 
     public function addOnCollisionCallback(callback:Function):void {

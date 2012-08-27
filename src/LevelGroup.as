@@ -27,7 +27,7 @@ package
 
     public function LevelGroup(roomType:Number=0) {
       background = new FlxGroup();
-      add(background);
+      FlxG.state.add(background);
       init(roomType);
     }
 
@@ -99,7 +99,7 @@ package
         for(x = 0; x < tiles[0].length; x++) {
           //LAY THOSE BRICKS DOWN
           if(tiles[y][x] == FEATURES.WALL) {
-            brick = new BrickSprite(x*TILE_SIZE, y*TILE_SIZE, roomType);
+            brick = new BrickSprite(x, y, roomType);
             brick.allowCollisions = FlxObject.LEFT | FlxObject.RIGHT;
             if(y > 0 && tiles[y-1][x] != 0) brick.allowCollisions |= FlxObject.UP;
             add(brick);
@@ -112,7 +112,7 @@ package
       //Add the goal
       for (var n:Number = tiles.length - 1; n > 1; n--) {
         if(tiles[n][tiles[n].length-3] == -1) {
-          var goal:GoalSprite = new GoalSprite(352, 16*n);
+          var goal:GoalSprite = new GoalSprite(22, n);
           add(goal);
           break;
         }

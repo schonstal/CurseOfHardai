@@ -6,6 +6,7 @@ package
   {
     public function WallSprite():void {
       super(0,0);
+      loadGraphic(Assets.TileSet, true, false, 16, 16, false);
       solid = false;
     }
 

@@ -8,8 +8,14 @@ package
 
     private var levelGroup:LevelGroup;
 
+    private var currentGeneration:Array;
+    private var nextGeneration:Array;
+
     override public function create():void {
-      levelGroup = new LevelGroup(1);//Math.floor(Math.random() * 2.999));
+      currentGeneration = new Array();
+      nextGeneration = new Array();
+
+      levelGroup = new LevelGroup(1);
       add(levelGroup);
 
       if(!G.playedMusic) {
