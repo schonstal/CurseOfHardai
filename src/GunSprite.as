@@ -38,7 +38,7 @@ package
     public function activationSequence(title:String, frameIndex:uint, frame:uint):void {
       var t:Array = title.split(' ');
       if(frameIndex == 1 && (title == "horizontal" || title == "diagonal")) {
-        fireBullets();
+        fireBullets(title == "horizontal");
         play(title + " fire");
       } else if(frameIndex == 1 && (t[1] == "fire")) {
         play(t[0] + " rotate");
@@ -47,22 +47,46 @@ package
       }
     }
 
-    public function fireBullets(horizontal:Boolean = false):void {
-      var bullet:BulletSprite = bullets.recycle(BulletSprite) as BulletSprite;
-      bullet.init(x + (width/2 - bullet.width/2), y - 10);
-      bullet.velocity.y = -BulletSprite.SPEED;
+    public function fireBullets(horizontal:Boolean):void {
+      var bullet:BulletSprite;
+      if(horizontal) {
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x + (width/2 - bullet.width/2), y - 10);
+        bullet.velocity.y = -BulletSprite.SPEED;
 
-      bullet = bullets.recycle(BulletSprite) as BulletSprite;
-      bullet.init(x + (width/2 - bullet.width/2), y + 20);
-      bullet.velocity.y = BulletSprite.SPEED;
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x + (width/2 - bullet.width/2), y + 20);
+        bullet.velocity.y = BulletSprite.SPEED;
 
-      bullet = bullets.recycle(BulletSprite) as BulletSprite;
-      bullet.init(x - 10, y + (height/2 - bullet.height/2));
-      bullet.velocity.x = -BulletSprite.SPEED;
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x - 10, y + (height/2 - bullet.height/2));
+        bullet.velocity.x = -BulletSprite.SPEED;
 
-      bullet = bullets.recycle(BulletSprite) as BulletSprite;
-      bullet.init(x + 20, y + (height/2 - bullet.height/2));
-      bullet.velocity.x = BulletSprite.SPEED;
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x + 20, y + (height/2 - bullet.height/2));
+        bullet.velocity.x = BulletSprite.SPEED;
+      } else {
+        var speed:Number = BulletSprite.SPEED * 0.7;
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x-7, y-7);
+        bullet.velocity.y = -speed;
+        bullet.velocity.x = -speed;
+
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x-7, y+17);
+        bullet.velocity.y = speed;
+        bullet.velocity.x = -speed;
+
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x+17, y-7);
+        bullet.velocity.y = -speed;
+        bullet.velocity.x = speed;
+
+        bullet = bullets.recycle(BulletSprite) as BulletSprite;
+        bullet.init(x+17, y+17);
+        bullet.velocity.y = speed;
+        bullet.velocity.x = speed;
+      }
     }
   }
 }
