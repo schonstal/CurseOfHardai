@@ -7,6 +7,7 @@ package
     public function BrickSprite(X:Number, Y:Number, colorIndex:int):void {
       super(X,Y);
       immovable = true;
+      loadGraphic(Assets.TileSet, true, false, 16, 16, false);
       addOnCollisionCallback(setPlayerFlags);
       frame = (Math.random() < 0.5 ? 0 : 1) + 8*colorIndex;
     }

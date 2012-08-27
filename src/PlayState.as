@@ -8,8 +8,20 @@ package
 
     private var levelGroup:LevelGroup;
 
+    private var currentGeneration:Array;
+    private var nextGeneration:Array;
+
     override public function create():void {
-      levelGroup = new LevelGroup(1);//Math.floor(Math.random() * 2.999));
+      currentGeneration = new Array();
+      nextGeneration = new Array();
+
+      var motherGroup:LevelGroup = new LevelGroup(2);
+      var fatherGroup:LevelGroup = new LevelGroup(0);
+      levelGroup = new LevelGroup();
+      levelGroup.reproduce(motherGroup, fatherGroup);
+      if(FlxG.level == 0) levelGroup = motherGroup;
+      else if(FlxG.level == 1) levelGroup = fatherGroup;
+
       add(levelGroup);
 
       if(!G.playedMusic) {
@@ -33,7 +45,7 @@ package
     }
 
     public function endLevel(success:Boolean=false):void {
-      FlxG.level++;
+      if(success) FlxG.level++;
       FlxG.log("butts");
       FlxG.switchState(new PlayState());
     }
