@@ -50,7 +50,7 @@ package
     }
 
     override public function update():void {
-      if(FlxG.keys.justPressed("SPACE")) FlxG.switchState(new PlayState());
+      if(FlxG.keys.justPressed("SPACE")) endLevel();//FlxG.switchState(new PlayState());
       super.update();
       if(!G.paused) {
         player.resetFlags();
@@ -79,7 +79,45 @@ package
       }
     }
 
-    public function makeLevelsFuck():void {
+    public function mateLevels():void {
+      var mother:LevelGroup = null;
+      var father:LevelGroup = null;
+      var baby:LevelGroup = null;
+
+      tempGeneration = new Array();
+
+      //currentGeneration.sortOn("fitness", Array.DESCENDING);
+      
+      for each(var level:LevelGroup in nextGeneration) {
+        /*while(mother == null) {
+          for(var i:int = 0; i < 9; i++) {
+            if(Math.random() < 0.2) {
+              mother = currentGeneration[i];
+              break;
+            }
+          }
+        }
+
+        while(father == null || mother == father) {
+          for(var j:int = 0; j < 9; j++) {
+            if(Math.random() < 0.2) {
+              father = currentGeneration[i];
+              break;
+            }
+          }
+        }*/
+
+        mother = currentGeneration[0];
+        father = currentGeneration[1];
+
+        FlxG.log(mother == father);
+
+        level.reproduce(mother, father);
+      }
+      
+      tempGeneration = nextGeneration;
+      nextGeneration = currentGeneration;
+      currentGeneration = tempGeneration;
     }
 
     public function die():void {
@@ -117,8 +155,12 @@ package
         add(levelGroup);
         teleportIn();
       } else {
+        remove(levelGroup);
         FlxG.level = 0;
-        //Do mating
+        mateLevels();
+        levelGroup = currentGeneration[FlxG.level];
+        add(levelGroup);
+        teleportIn();
       }
     }
   }
