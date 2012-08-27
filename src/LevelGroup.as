@@ -129,7 +129,7 @@ package
 
       //Lay down bricks for empty area
       var topThickness:Number = 3;
-      var bottomThickness:Number = roomType == 2 ? 3 : 4;
+      var bottomThickness:Number = 4;
       var y:int = 1; //Fuck AS3
 
       for(var x:int = 0; x < tiles[0].length; x++) {
@@ -218,6 +218,47 @@ package
     }
 
     public function initializeGuns():void {
+      var topThickness:Number = 4;
+      var y:int = 1;
+      var gun:GunSprite;
+      var safe:Boolean = false;
+
+      for(var x:int = 3; x < tiles[0].length - 6; x++) {
+        for(y = 3; y < tiles.length - 4; y++) {
+          if(tiles[y][x] != -1) {
+            continue;
+          } else if (Math.random() < 0.075) {
+            safe = true;
+            tileRange(x, y, 3, 3, function(j:int, k:int):void {
+              if(tiles[k][j] != -1) {
+                safe = false;
+              }
+            });
+            if(safe) {
+              tileRange(x, y, 3, 3, function(j:int, k:int):void {
+                tiles[k][j] = FEATURES.GUN;
+              });
+              gunTiles.push(new GunSprite(x+1, y+1));
+            }
+          }
+        }
+      }
+
+      for each(gun in gunTiles) {
+        guns.add(gun);
+      }
+    }
+
+    public function tileRange(X:int, Y:int, width:int, height:int, callback:Function):void {
+      var x:int;
+      var y:int;
+
+      for(x = X; x < X+width; x++)
+        for(y = Y; y < Y+height; y++)
+          callback(x, y);
+    }
+
+    public function addGun():void {
     }
 
     public function initializePits():void {

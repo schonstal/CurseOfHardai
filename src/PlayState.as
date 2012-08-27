@@ -22,7 +22,7 @@ package
       if(FlxG.level == 0) levelGroup = motherGroup;
       else if(FlxG.level == 1) levelGroup = fatherGroup;*/
 
-      levelGroup = new LevelGroup(2);
+      levelGroup = new LevelGroup(1);
       add(levelGroup);
 
       if(!G.playedMusic) {
