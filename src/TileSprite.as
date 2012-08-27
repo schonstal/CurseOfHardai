@@ -18,6 +18,13 @@ package
       immovable = true;
     }
 
+    public function initTile(X:Number, Y:Number):void {
+      tileX = X;
+      tileY = Y;
+      x = X * WIDTH
+      y = Y * WIDTH;
+    }
+
     public function addOnCollisionCallback(callback:Function):void {
       collisionCallbacks.push(callback);
     }

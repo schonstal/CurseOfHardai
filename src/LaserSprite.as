@@ -27,6 +27,15 @@ package
       play("idle");
     }
 
+    public function init(X:Number, Y:Number):void {
+      initTile(X, Y);
+
+      x += offset.x;
+      _active = false;
+      _idle = true;
+      play("idle");
+    }
+
     public function activationSequence(title:String, frameIndex:uint, frame:uint):void {
       if(title == "tripped" && frameIndex == 5) {
         play("on");

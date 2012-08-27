@@ -6,7 +6,7 @@ package
   {
     public function GunSprite(X:Number, Y:Number):void {
       super(X,Y);
-      makeGraphic(24, 24, 0xffcc22cc);
+      loadGraphic(Assets.Turret, true, false, 24, 24);
       width = height = 16;
       offset.x = offset.y = 4;
     }
