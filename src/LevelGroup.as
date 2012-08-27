@@ -11,27 +11,89 @@ package
     };
 
     private var tiles:Array;
-    private var background:FlxGroup;
+
+    //genetic information
+    public var laserTiles:Array;
+    public var gunTiles:Array;
+    public var brickTiles:Object;
+    public var bgTiles:Object;
+    public var pits:Array;
+    
+
+    public var bg:FlxGroup;
+    public var lasers:FlxGroup;
+    public var guns:FlxGroup;
+    public var bullets:FlxGroup;
+    public var bricks:FlxGroup;
+
+    public var goal:GoalSprite;
 
     public static const FEATURES:Object = {
       WALL:   0,
       SQUARE: 1,
       PIT:    2,
-      BOX_1:  3,
-      BOX_2:  4,
-      BOX_3:  5,
-      BOX_4:  6
+      GUN:    3,
+      LASER:  4
     }
 
     public static const TILE_SIZE:Number = 16;
 
     public function LevelGroup(roomType:Number=0) {
-      background = new FlxGroup();
-      FlxG.state.add(background);
+      clearGroups();
       init(roomType);
     }
 
-    public function reporoduce(mother:Array, father:Array):void {
+    public function clearGroups():void {
+      if(bg) {
+        remove(bg);
+        remove(lasers);
+        remove(guns);
+        remove(bullets);
+        remove(bricks);
+      }
+
+      bg = new FlxGroup();
+      lasers = new FlxGroup();
+      guns = new FlxGroup();
+      bullets = new FlxGroup();
+      bricks = new FlxGroup();
+
+      add(bg);
+      add(lasers);
+      add(guns);
+      add(bullets);
+      add(bricks);
+
+      laserTiles = new Array();
+      gunTiles = new Array();
+      pits = new Array();
+
+      brickTiles = {};
+      bgTiles = {};
+    }
+
+    public function reproduce(mother:LevelGroup, father:LevelGroup):LevelGroup {
+      clearGroups();
+
+      var x:int;
+      var y:int;
+      var level:LevelGroup;
+      for(y = 0; y < 15; y++) {
+        for(x = 0; x < 25; x++) {
+          level = Math.random() > 0.5 ? mother : father;
+          if(level.brickTiles[cacheKey(x,y)] != null) {
+            add(level.brickTiles[cacheKey(x,y)]);
+          } else {
+            add(level.bgTiles[cacheKey(x,y)]);
+          }
+        }
+      }
+
+      return this;
+    }
+
+    public function cacheKey(X:Number, Y:Number):String {
+      return "" + X + ":" + Y;
     }
 
     public function emptyRoom():Array {
@@ -59,9 +121,7 @@ package
 
       if(roomType == 0) {
         initializePits();
-      } else if(roomType == 1) {
-      } else {
-      }
+      } 
 
       //Lay down bricks for empty area
       var topThickness:Number = 3;
@@ -81,6 +141,8 @@ package
         }
       }
 
+      if(roomType == 1) initializeLasers();
+
       for(x = 0; x < tiles[0].length; x++) {
         for(y = tiles.length-1; y >= tiles.length - bottomThickness; y--) {
           if(tiles[y][x] != -1) break;
@@ -94,17 +156,16 @@ package
         }
       }
 
-      var brick:BrickSprite;
       for(y = 0; y < tiles.length; y++) {
         for(x = 0; x < tiles[0].length; x++) {
           //LAY THOSE BRICKS DOWN
           if(tiles[y][x] == FEATURES.WALL) {
-            brick = new BrickSprite(x, y, roomType);
-            brick.allowCollisions = FlxObject.LEFT | FlxObject.RIGHT;
-            if(y > 0 && tiles[y-1][x] != 0) brick.allowCollisions |= FlxObject.UP;
-            add(brick);
+            brickTiles[cacheKey(x,y)] = new BrickSprite(x, y, roomType);
+            brickTiles[cacheKey(x,y)].allowCollisions = FlxObject.LEFT | FlxObject.RIGHT | FlxObject.UP; //TODO
+            if(y > 0 && tiles[y-1][x] != 0) brickTiles[cacheKey(x,y)].allowCollisions |= FlxObject.UP;
+            bricks.add(brickTiles[cacheKey(x,y)]);
           } else {
-            background.add((recycle(WallSprite) as WallSprite).init(x*TILE_SIZE, y*TILE_SIZE, roomType));
+            bgTiles[cacheKey(x,y)] = (bg.recycle(WallSprite) as WallSprite).init(x, y, roomType);
           }
         }
       }
@@ -127,19 +188,26 @@ package
       //add(s);
     }
 
+    public function initializeLasers():void {
+    }
+
+    public function initializeGuns():void {
+    }
+
     public function initializePits():void {
       var tileIndex:Number = 7;
       var digLength:Number = 0;
       var digMax:Number = 7;
+      var y:int;
 
       for(var x:int = 3; x < tiles[tileIndex].length - 3; x++) {
         if(digLength <= digMax && Math.random() <= 0.3 && !(digLength == 0 && x >= tiles[0].length - 4)) {
           digLength++;
-          for(var y:int = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
+          for(y = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
         } else {
           if(digLength > 0 && digLength < 3) {
             digLength++;
-            for(var y:int = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
+            for(y = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
           } else {
             digLength = 0;
           }
