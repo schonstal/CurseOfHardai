@@ -38,7 +38,7 @@ package
     public function activationSequence(title:String, frameIndex:uint, frame:uint):void {
       var t:Array = title.split(' ');
       if(frameIndex == 1 && (title == "horizontal" || title == "diagonal")) {
-        fireBullet();
+        fireBullets();
         play(title + " fire");
       } else if(frameIndex == 1 && (t[1] == "fire")) {
         play(t[0] + " rotate");
@@ -47,9 +47,22 @@ package
       }
     }
 
-    public function fireBullet():void {
+    public function fireBullets(horizontal:Boolean = false):void {
       var bullet:BulletSprite = bullets.recycle(BulletSprite) as BulletSprite;
-      bullet.init(x + (width/2 - bullet.width/2), y);
+      bullet.init(x + (width/2 - bullet.width/2), y - 10);
+      bullet.velocity.y = -BulletSprite.SPEED;
+
+      bullet = bullets.recycle(BulletSprite) as BulletSprite;
+      bullet.init(x + (width/2 - bullet.width/2), y + 20);
+      bullet.velocity.y = BulletSprite.SPEED;
+
+      bullet = bullets.recycle(BulletSprite) as BulletSprite;
+      bullet.init(x - 10, y + (height/2 - bullet.height/2));
+      bullet.velocity.x = -BulletSprite.SPEED;
+
+      bullet = bullets.recycle(BulletSprite) as BulletSprite;
+      bullet.init(x + 20, y + (height/2 - bullet.height/2));
+      bullet.velocity.x = BulletSprite.SPEED;
     }
   }
 }
