@@ -15,13 +15,13 @@ package
       addAnimation("idle", [1], 15, false);
       addAnimation("tripped", [0, 1, 0, 1, 0, 0], 20, false);
       addAnimation("on", [2, 3, 2, 3, 2, 3, 2, 3], 15, false);
-      addAnimation("cool down", [4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 10, false);
+      addAnimation("cool down", [4, 5, 0, 0, 0, 0, 6, 7, 8, 9, 10, 11], 10, false);
 
       addOnCollisionCallback(trigger);
       addAnimationCallback(activationSequence);
 
-      width = 2;
-      offset.x = 7;
+      width = 4;
+      offset.x = 6;
       x += offset.x;
 
       play("idle");
