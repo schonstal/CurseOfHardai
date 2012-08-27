@@ -15,13 +15,14 @@ package
       currentGeneration = new Array();
       nextGeneration = new Array();
 
-      var motherGroup:LevelGroup = new LevelGroup(2);
+      /*var motherGroup:LevelGroup = new LevelGroup(2);
       var fatherGroup:LevelGroup = new LevelGroup(0);
-      levelGroup = new LevelGroup();
+      levelGroup = new LevelGroup(0, true);
       levelGroup.reproduce(motherGroup, fatherGroup);
       if(FlxG.level == 0) levelGroup = motherGroup;
-      else if(FlxG.level == 1) levelGroup = fatherGroup;
+      else if(FlxG.level == 1) levelGroup = fatherGroup;*/
 
+      levelGroup = new LevelGroup(2);
       add(levelGroup);
 
       if(!G.playedMusic) {
@@ -39,7 +40,11 @@ package
       super.update();
       player.resetFlags();
 
-      FlxG.collide(player, levelGroup, function(player:Player, tile:TileSprite):void {
+      FlxG.collide(player, levelGroup.bricks, function(player:Player, tile:TileSprite):void {
+        tile.onCollide(player);
+      });
+
+      FlxG.overlap(player, levelGroup.lasers, function(player:Player, tile:TileSprite):void {
         tile.onCollide(player);
       });
     }

@@ -38,9 +38,11 @@ package
 
     public static const TILE_SIZE:Number = 16;
 
-    public function LevelGroup(roomType:Number=0) {
+    public function LevelGroup(roomType:Number=0, shell:Boolean = false) {
       clearGroups();
-      init(roomType);
+      if(!shell) init(roomType);
+
+      lasers.add(new LaserSprite(5,5));
     }
 
     public function clearGroups():void {
@@ -74,6 +76,10 @@ package
 
     public function reproduce(mother:LevelGroup, father:LevelGroup):LevelGroup {
       clearGroups();
+
+      //remember to weight near tiles (+0.1 parent / -0.1 other parent for each near tile)
+
+      //when copying tiles copy tiles from near the copied thing
 
       var x:int;
       var y:int;
@@ -116,7 +122,6 @@ package
     }
 
     public function init(roomType:Number):void {
-      FlxG.log(roomType);
       tiles = emptyRoom();
 
       if(roomType == 0) {
@@ -141,8 +146,6 @@ package
         }
       }
 
-      if(roomType == 1) initializeLasers();
-
       for(x = 0; x < tiles[0].length; x++) {
         for(y = tiles.length-1; y >= tiles.length - bottomThickness; y--) {
           if(tiles[y][x] != -1) break;
@@ -155,6 +158,9 @@ package
           else bottomThickness++;
         }
       }
+      
+      if(roomType == 2) initializeGuns();
+      if(roomType == 1) initializeLasers();
 
       for(y = 0; y < tiles.length; y++) {
         for(x = 0; x < tiles[0].length; x++) {
