@@ -13,8 +13,8 @@ package
       addAnimation("horizontal", [0, 0], 2, false);
       addAnimation("diagonal", [3, 3], 2, false);
 
-      addAnimation("horizontal fire", [0, 0], 2, false);
-      addAnimation("diagonal fire", [3, 3], 2, false);
+      addAnimation("horizontal fire", [0, 0, 0, 0], 2, false);
+      addAnimation("diagonal fire", [3, 3, 3, 3], 2, false);
 
       addAnimation("horizontal rotate", [1,1,2,3], 15, false);
       addAnimation("diagonal rotate", [4,4,5,0], 15, false);
@@ -40,7 +40,7 @@ package
       if(frameIndex == 1 && (title == "horizontal" || title == "diagonal")) {
         fireBullets(title == "horizontal");
         play(title + " fire");
-      } else if(frameIndex == 1 && (t[1] == "fire")) {
+      } else if(frameIndex == 3 && (t[1] == "fire")) {
         play(t[0] + " rotate");
       } else if(frameIndex == 3 && t[1] == "rotate") {
         play(t[0] == "horizontal" ? "diagonal" : "horizontal"); 

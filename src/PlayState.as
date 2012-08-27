@@ -89,32 +89,34 @@ package
       var mother:LevelGroup = null;
       var father:LevelGroup = null;
       var baby:LevelGroup = null;
+      var chance:Number = 0.3;
 
       tempGeneration = new Array();
 
-      //currentGeneration.sortOn("fitness", Array.DESCENDING);
+      G.generation++;
+
+      currentGeneration.sortOn("fitness", Array.DESCENDING);
       
       for each(var level:LevelGroup in nextGeneration) {
-        /*while(mother == null) {
-          for(var i:int = 0; i < 9; i++) {
-            if(Math.random() < 0.2) {
-              mother = currentGeneration[i];
-              break;
-            }
+        mother = currentGeneration[0];
+        for(var i:int = 0; i < 8; i++) {
+          if(Math.random() < chance) {
+            mother = currentGeneration[i];
+            chance -= 0.03;
           }
         }
 
-        while(father == null || mother == father) {
-          for(var j:int = 0; j < 9; j++) {
-            if(Math.random() < 0.2) {
-              father = currentGeneration[i];
-              break;
-            }
-          }
-        }*/
-
-        mother = currentGeneration[0];
+        chance = 0.3;
+        
         father = currentGeneration[1];
+        for(var j:int = 0; j < 8; j++) {
+          if(Math.random() < chance) {
+            father = currentGeneration[i];
+            chance -= 0.03;
+          }
+        }
+
+        if(father == null || mother == null) trace("PENIS");
 
         level.reproduce(mother, father);
       }
@@ -127,6 +129,7 @@ package
     public function die():void {
       G.paused = true;
       teleportIn();
+      levelGroup.fitness += 15;
       levelGroup.rebase();
     }
 

@@ -6,6 +6,7 @@ package
     {
         public var _playedMusic:Boolean;
         public var _paused:Boolean;
+        public var _generation:int;
 
         private static var _instance:G = null;
 
@@ -17,6 +18,7 @@ package
                 _instance = new G();
                 _instance._playedMusic = false;
                 _instance._paused = false;
+                _instance._generation = 1;
             }
 
             return _instance;
@@ -36,6 +38,14 @@ package
 
         public static function set paused(value:Boolean):void {
           instance._paused = value;
+        }
+
+        public static function get generation():int {
+          return instance._generation;
+        }
+
+        public static function set generation(value:int):void {
+          instance._generation = value;
         }
     }
 }

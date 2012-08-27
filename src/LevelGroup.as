@@ -10,9 +10,13 @@ package
       2: [BrickSprite]
     };
 
+    public static const GUN_FITNESS:Number = 7;
+    public static const LASER_FITNESS:Number = 1;
+    public static const PIT_FITNESS:Number = 1;
+
     private var tiles:Array;
    
-    public var fitness:Number = 1;
+    public var fitness:Number = 0;
 
     //genetic information
     public var laserTiles:Array;
@@ -94,18 +98,20 @@ package
       var y:int;
       var level:LevelGroup;
       
-      /*for(y = 0; y < 15; y++) {
+      for(y = 0; y < 15; y++) {
         for(x = 0; x < 25; x++) {
           level = Math.random() > 0.5 ? mother : father;
-          if(level.brickTiles[cacheKey(x,y)] != null) {
-            brickTiles[cacheKey(x,y)] = level.brickTiles[cacheKey(x,y)];
-            add(level.brickTiles[cacheKey(x,y)]);
-          } else {
-            bgTiles[cacheKey(x,y)] = level.bgTiles[cacheKey(x,y)];
-            add(level.bgTiles[cacheKey(x,y)]);
+          if(tiles[y][x] == -1 || tiles[y][x] == 0) {
+            if(level.brickTiles[cacheKey(x,y)] != null) {
+              brickTiles[cacheKey(x,y)] = level.brickTiles[cacheKey(x,y)];
+              bricks.add(level.brickTiles[cacheKey(x,y)]);
+            } else {
+              bgTiles[cacheKey(x,y)] = level.bgTiles[cacheKey(x,y)];
+              bg.add(level.bgTiles[cacheKey(x,y)]);
+            }
           }
         }
-      }*/
+      }
 
       return this;
     }
@@ -119,7 +125,7 @@ package
       var motherGuns:Array = mother.gunTiles.concat();
       var fatherGuns:Array = father.gunTiles.concat();
       var gunTotal:int = motherGuns.length + fatherGuns.length;
-      var numGuns:int = Math.ceil(Math.random() * gunTotal);
+      var numGuns:int = gunTotal;
       var gun:GunSprite;
       var safe:Boolean = true;
       var parent:LevelGroup;
@@ -127,8 +133,7 @@ package
       motherGuns.sort(randomSort);
       fatherGuns.sort(randomSort);
 
-      //More than 3 is impossible
-      if(numGuns > 3) numGuns = 3;
+      if(numGuns > G.generation + 1) numGuns = G.generation + 1;
 
       for(var i:int = 0; i < numGuns; i++) {
         if(motherGuns.length == 0) {
@@ -158,7 +163,7 @@ package
               if(parent.brickTiles[cacheKey(x,y)]) {
                 brickTiles[cacheKey(x,y)] = parent.brickTiles[cacheKey(x,y)];
                 bricks.add(brickTiles[cacheKey(x,y)]);
-              } else {
+              } else if(parent.bgTiles[cacheKey(x,y)]) {
                 bgTiles[cacheKey(x,y)] = parent.bgTiles[cacheKey(x,y)];
                 bg.add(bgTiles[cacheKey(x,y)]);
               }
@@ -170,13 +175,120 @@ package
 
       for each(gun in gunTiles) {
         guns.add(gun);
+        fitness += GUN_FITNESS;
       }
     }
 
     public function copyLasers(mother:LevelGroup, father:LevelGroup):void {
+      if(mother.laserTiles.length < 1 && father.laserTiles.length < 1) return;
+      var motherLasers:Array = mother.laserTiles.concat();
+      var fatherLasers:Array = father.laserTiles.concat();
+      var laserTotal:int = motherLasers.length + fatherLasers.length;
+      var numLasers:int = Math.ceil(Math.random() * laserTotal/2) + laserTotal/2;
+      var laser:LaserSprite;
+      var safe:Boolean = true;
+      var parent:LevelGroup;
+
+      motherLasers.sort(randomSort);
+      fatherLasers.sort(randomSort);
+      
+      var laserMin:int = G.generation * 2;
+
+      if(numLasers < laserMin) {
+        if(laserTotal < laserMin) numLasers = laserTotal;
+        else numLasers = laserMin;
+      }
+
+      for(var i:int = 0; i < numLasers; i++) {
+        if(motherLasers.length == 0) {
+          laser = fatherLasers.shift();
+          parent = father;
+        } else if(fatherLasers.length == 0) {
+          laser = motherLasers.shift();
+          parent = mother;
+        } else if(Math.random() < 0.5) {
+          laser = motherLasers.shift();
+          parent = mother;
+        } else {
+          laser = fatherLasers.shift();
+          parent = father;
+        }
+        if(laser == null) return;
+        safe = true;
+        tileRange(laser.tileX, laser.tileY-1, 1, 3, function(x:int, y:int):void {
+          if(tiles[y][x] != -1) {
+            safe = false;
+          }
+        });
+        if(safe) {
+          tileRange(laser.tileX, laser.tileY-1, 1, 3, function(x:int, y:int):void {
+            tiles[y][x] = FEATURES.LASER;
+            if(laser.tileX != x || laser.tileY != y) {
+              if(parent.brickTiles[cacheKey(x,y)]) {
+                brickTiles[cacheKey(x,y)] = parent.brickTiles[cacheKey(x,y)];
+                bricks.add(brickTiles[cacheKey(x,y)]);
+              } else if(parent.bgTiles[cacheKey(x,y)]) {
+                bgTiles[cacheKey(x,y)] = parent.bgTiles[cacheKey(x,y)];
+                bg.add(bgTiles[cacheKey(x,y)]);
+              }
+            }
+          });
+          laserTiles.push(laser);
+        }
+      }
+
+      for each(laser in laserTiles) {
+        lasers.add(laser);
+        fitness += LASER_FITNESS;
+      }
     }
 
     public function copyPits(mother:LevelGroup, father:LevelGroup):void {
+      if(mother.pits.length < 1 && father.pits.length < 1) return;
+      var motherPits:Array = mother.pits.concat();
+      var fatherPits:Array = father.pits.concat();
+      var pitTotal:int = motherPits.length + fatherPits.length;
+      var numPits:int = Math.ceil(Math.random() * pitTotal);
+      var pit:Array;
+      var parent:LevelGroup;
+
+      motherPits.sort(randomSort);
+      fatherPits.sort(randomSort);
+
+      var pitMin:int = G.generation - 1;
+      if(numPits < pitMin) {
+        if(pitTotal < pitMin) numPits = pitTotal;
+        else numPits = pitMin;
+      }
+
+      for(var i:int = 0; i < numPits; i++) {
+        if(motherPits.length == 0) {
+          pit = fatherPits.shift();
+          parent = father;
+        } else if(fatherPits.length == 0) {
+          pit = motherPits.shift();
+          parent = mother;
+        } else if(Math.random() < 0.5) {
+          pit = motherPits.shift();
+          parent = mother;
+        } else {
+          pit = fatherPits.shift();
+          parent = father;
+        }
+        if(pit == null) return;
+        tileRange(pit[0]-1, tiles.length-7, pit[1] + 2, 7, function(x:int, y:int):void {
+          if(tiles[y][x] != -1) return;
+          tiles[y][x] = FEATURES.PIT;
+          if(parent.brickTiles[cacheKey(x,y)]) {
+            brickTiles[cacheKey(x,y)] = parent.brickTiles[cacheKey(x,y)];
+            bricks.add(brickTiles[cacheKey(x,y)]);
+          } else if(parent.bgTiles[cacheKey(x,y)]) {
+            bgTiles[cacheKey(x,y)] = parent.bgTiles[cacheKey(x,y)];
+            bg.add(bgTiles[cacheKey(x,y)]);
+          }
+        });
+        pits.push(pit);
+      }
     }
 
     public function cacheKey(X:Number, Y:Number):String {
@@ -254,14 +366,6 @@ package
           }
         }
       }
-
-      //lol eyes
-      //var s:FlxSprite = new FlxSprite(336, 16*5);
-      //s.makeGraphic(16,16,0xff33cccc);
-      //add(s);
-      //s = new FlxSprite(368, 16*5);
-      //s.makeGraphic(16,16,0xff33cccc);
-      //add(s);
     }
 
     public function initializeLasers():void {
@@ -284,6 +388,7 @@ package
       }
 
       for each(laser in laserTiles) {
+        fitness += LASER_FITNESS;
         lasers.add(laser);
       }
     }
@@ -299,7 +404,7 @@ package
         for(var i:int = 0; i < 3; i++) {
           generated = false;
           tileRange(3 + i*(i == 2 ? 5 : 6), 4, 6, 8, function(x:int, y:int):void {
-            if (Math.random() < 0.0125 && !generated) {
+            if (Math.random() < 0.02 && !generated) {
               if(tiles[y][x] != -1) return;
                 safe = true;
                 tileRange(x, y, 3, 3, function(j:int, k:int):void {
@@ -320,6 +425,7 @@ package
       } while(gunTiles.length == 0)
 
       for each(gun in gunTiles) {
+        fitness += GUN_FITNESS;
         guns.add(gun);
       }
     }
@@ -341,18 +447,32 @@ package
       var tileIndex:Number = 7;
       var digLength:Number = 0;
       var digMax:Number = 7;
+      var currentPit:Array = null;
       var y:int;
 
-      for(var x:int = 3; x < tiles[tileIndex].length - 3; x++) {
-        if(digLength <= digMax && Math.random() <= 0.3 && !(digLength == 0 && x >= tiles[0].length - 4)) {
-          digLength++;
-          for(y = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
-        } else {
-          if(digLength > 0 && digLength < 3) {
+      while(pits.length == 0) {
+        for(var x:int = 3; x < tiles[tileIndex].length - 3; x++) {
+          if(digLength <= digMax && Math.random() <= 0.3 && !(digLength == 0 && x >= tiles[0].length - 4)) {
+            fitness += PIT_FITNESS;
+            if(digLength == 0) currentPit = [x, 1];
             digLength++;
             for(y = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
           } else {
-            digLength = 0;
+            if(digLength > 0 && digLength < 3) {
+              fitness += PIT_FITNESS;
+              digLength++;
+              for(y = tileIndex; y < tiles.length; y++) { tiles[y][x] = FEATURES.PIT; }
+            } else {
+              if(digLength > 0 && currentPit) {
+                currentPit[1] = digLength;
+                pits.push(currentPit);
+              }
+              digLength = 0;
+            }
+          }
+          if(digLength > 0 && currentPit) {
+            currentPit[1] = digLength;
+            pits.push(currentPit);
           }
         }
       }
