@@ -75,6 +75,8 @@ package
 
       brickTiles = {};
       bgTiles = {};
+
+      tiles = emptyRoom();
     }
 
     public function reproduce(mother:LevelGroup, father:LevelGroup):LevelGroup {
@@ -84,14 +86,15 @@ package
 
       //when copying tiles copy tiles from near the copied thing
 
-      copyGuns();
-      copyLasers();
-      copyPits();
+      copyGuns(mother, father);
+      copyLasers(mother, father);
+      copyPits(mother, father);
 
       var x:int;
       var y:int;
       var level:LevelGroup;
-      for(y = 0; y < 15; y++) {
+      
+      /*for(y = 0; y < 15; y++) {
         for(x = 0; x < 25; x++) {
           level = Math.random() > 0.5 ? mother : father;
           if(level.brickTiles[cacheKey(x,y)] != null) {
@@ -102,18 +105,78 @@ package
             add(level.bgTiles[cacheKey(x,y)]);
           }
         }
-      }
+      }*/
 
       return this;
     }
 
-    public function copyGuns():void {
+    public function randomSort(a:Object, b:Object):Number {
+      return Math.random() < 0.5 ? -1 : 1;
     }
 
-    public function copyLasers():void {
+    public function copyGuns(mother:LevelGroup, father:LevelGroup):void {
+      if(mother.gunTiles.length < 1 && father.gunTiles.length < 1) return;
+      var motherGuns:Array = mother.gunTiles.concat();
+      var fatherGuns:Array = father.gunTiles.concat();
+      var gunTotal:int = motherGuns.length + fatherGuns.length;
+      var numGuns:int = Math.ceil(Math.random() * gunTotal);
+      var gun:GunSprite;
+      var safe:Boolean = true;
+      var parent:LevelGroup;
+
+      motherGuns.sort(randomSort);
+      fatherGuns.sort(randomSort);
+
+      //More than 3 is impossible
+      if(numGuns > 3) numGuns = 3;
+
+      for(var i:int = 0; i < numGuns; i++) {
+        if(motherGuns.length == 0) {
+          gun = fatherGuns.shift();
+          parent = father;
+        } else if(fatherGuns.length == 0) {
+          gun = motherGuns.shift();
+          parent = mother;
+        } else if(Math.random() < 0.5) {
+          gun = motherGuns.shift();
+          parent = mother;
+        } else {
+          gun = fatherGuns.shift();
+          parent = father;
+        }
+        if(gun == null) return;
+        safe = true;
+        tileRange(gun.tileX-1, gun.tileY-1, 3, 3, function(x:int, y:int):void {
+          if(tiles[y][x] != -1) {
+            safe = false;
+          }
+        });
+        if(safe) {
+          tileRange(gun.tileX-1, gun.tileY-1, 3, 3, function(x:int, y:int):void {
+            tiles[y][x] = FEATURES.GUN;
+            if(gun.tileX != x || gun.tileY != y) {
+              if(parent.brickTiles[cacheKey(x,y)]) {
+                brickTiles[cacheKey(x,y)] = parent.brickTiles[cacheKey(x,y)];
+                bricks.add(brickTiles[cacheKey(x,y)]);
+              } else {
+                bgTiles[cacheKey(x,y)] = parent.bgTiles[cacheKey(x,y)];
+                bg.add(bgTiles[cacheKey(x,y)]);
+              }
+            }
+          });
+          gunTiles.push(gun);
+        }
+      }
+
+      for each(gun in gunTiles) {
+        guns.add(gun);
+      }
     }
 
-    public function copyPits():void {
+    public function copyLasers(mother:LevelGroup, father:LevelGroup):void {
+    }
+
+    public function copyPits(mother:LevelGroup, father:LevelGroup):void {
     }
 
     public function cacheKey(X:Number, Y:Number):String {
@@ -140,8 +203,6 @@ package
     }
 
     public function init(roomType:Number):void {
-      tiles = emptyRoom();
-
       if(roomType == 0) {
         initializePits();
       } 

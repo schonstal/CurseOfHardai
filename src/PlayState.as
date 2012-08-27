@@ -116,8 +116,6 @@ package
         mother = currentGeneration[0];
         father = currentGeneration[1];
 
-        FlxG.log(mother == father);
-
         level.reproduce(mother, father);
       }
       
@@ -146,14 +144,12 @@ package
     }
 
     public function startLevel():void {
-      FlxG.log("starting " + FlxG.level);
       player = new Player(Player.START_X, Player.START_Y);
       add(player);
       G.paused = false;
     }
 
     public function endLevel():void {
-      FlxG.log("ending " + FlxG.level)
       FlxG.level++;
       if(FlxG.level <= 8) {
         remove(levelGroup);
