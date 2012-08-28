@@ -10,6 +10,10 @@ package
       glitch = new GlitchSprite();
       add(glitch);
 
+      var titleGraphic:FlxSprite = new FlxSprite();
+      titleGraphic.loadGraphic(Assets.Title, true, false, 400, 240, false);
+      add(titleGraphic);
+
       FlxG.playMusic(Assets.TitleMusic);
     }
 

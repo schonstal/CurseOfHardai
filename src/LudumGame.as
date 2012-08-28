@@ -9,7 +9,7 @@ package
     [Embed(source = '../data/adore64.ttf', fontFamily="adore", embedAsCFF="false")] public var AckFont:String;
     public function LudumGame() {
       FlxG.level = 0;
-      super(400,240,PlayState,2);
+      super(400,240,MenuState,2);
     }
   }
 }

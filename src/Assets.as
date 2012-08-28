@@ -13,6 +13,7 @@ package
     [Embed(source = "../data/teleporter.png")] public static var Teleporter:Class;
     [Embed(source = "../data/playerSplode.png")] public static var Death:Class;
     [Embed(source = "../data/hardaiGlitch.png")] public static var Glitch:Class;
+    [Embed(source = "../data/title.png")] public static var Title:Class;
 
     [Embed(source = "../data/music/game.mp3")] public static var GameMusic:Class;
     [Embed(source = "../data/music/title.mp3")] public static var TitleMusic:Class;

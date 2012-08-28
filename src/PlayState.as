@@ -98,6 +98,7 @@ package
           G.paused = false;
           teleportIn();
           evolving = false;
+          FlxG.playMusic(Assets.GameMusic);
         }
       }
     }
@@ -194,6 +195,7 @@ package
         G.paused = true;
         glitchTimer = 0;
         evolving = true;
+        FlxG.playMusic(Assets.TitleMusic);
       }
     }
   }
