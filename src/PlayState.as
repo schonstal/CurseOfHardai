@@ -10,6 +10,11 @@ package
     public var goal:GoalSprite;
 
     private var levelGroup:LevelGroup;
+    private var glitch:GlitchSprite;
+    private var evolving:Boolean = false;
+
+    private var glitchTimer:Number = 0;
+    private var glitchThreshold:Number = 2;
 
     private var currentGeneration:Array;
     private var nextGeneration:Array;
@@ -52,6 +57,8 @@ package
       levelGroup.updateGoal();
       add(goal);
 
+      glitch = new GlitchSprite();
+
       //FlxG.visualDebug = true;
     }
 
@@ -81,6 +88,17 @@ package
             function(brick:BrickSprite, bullet:BulletSprite):void {
               bullet.onCollide();
             });
+      }
+
+      if(evolving) {
+        remove(player);
+        glitchTimer += FlxG.elapsed;
+        if(glitchTimer >= glitchThreshold) {
+          remove(glitch);
+          G.paused = false;
+          teleportIn();
+          evolving = false;
+        }
       }
     }
 
@@ -139,6 +157,7 @@ package
     }
     
     public function teleportIn():void {
+      remove(glitch);
       remove(player);
       levelGroup.updateGoal();
       teleporter.init(Player.START_X, Player.START_Y);
@@ -170,7 +189,11 @@ package
         levelGroup.rebase();
         add(levelGroup);
         add(goal);
-        teleportIn();
+        add(glitch);
+        remove(player);
+        G.paused = true;
+        glitchTimer = 0;
+        evolving = true;
       }
     }
   }

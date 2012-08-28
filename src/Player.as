@@ -102,7 +102,7 @@ package
       if(!G.paused) {
         //Check for jump input, allow for early timing
         jumpTimer += FlxG.elapsed;
-        if(FlxG.keys.justPressed("W") || FlxG.keys.justPressed("SPACE") || FlxG.keys.justPressed("UP")) {
+        if(FlxG.keys.justPressed("W") || FlxG.keys.justPressed("UP")) {
           _jumpPressed = true;
           jumpTimer = 0;
         }

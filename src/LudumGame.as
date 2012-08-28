@@ -10,9 +10,6 @@ package
     public function LudumGame() {
       FlxG.level = 0;
       super(400,240,PlayState,2);
-
-      forceDebugger = true;
-      FlxG.debug = true;
     }
   }
 }
