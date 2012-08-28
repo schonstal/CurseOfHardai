@@ -56,7 +56,6 @@ package
     }
 
     override public function update():void {
-      if(FlxG.keys.justPressed("SPACE")) endLevel();//FlxG.switchState(new PlayState());
       super.update();
       if(!G.paused) {
         player.resetFlags();
@@ -128,9 +127,9 @@ package
 
     public function die():void {
       G.paused = true;
-      teleportIn();
+      remove(player);
+      add(new DeatherSprite(player.x, player.y));
       levelGroup.fitness += 15;
-      levelGroup.rebase();
     }
 
     public function teleportOut():void {
@@ -152,8 +151,8 @@ package
       G.paused = false;
     }
 
-    public function endLevel():void {
-      FlxG.level++;
+    public function endLevel(increment:Boolean = true):void {
+      if(increment) FlxG.level++;
       if(FlxG.level <= 8) {
         remove(levelGroup);
         remove(goal);
