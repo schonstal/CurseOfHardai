@@ -36,7 +36,8 @@ package
       SQUARE: 1,
       PIT:    2,
       GUN:    3,
-      LASER:  4
+      LASER:  4,
+      GOAL:   5
     }
 
     public static const TILE_SIZE:Number = 16;
@@ -96,23 +97,97 @@ package
 
       var x:int;
       var y:int;
-      var level:LevelGroup;
-      
-      for(y = 0; y < 15; y++) {
-        for(x = 0; x < 25; x++) {
-          level = Math.random() > 0.5 ? mother : father;
-          if(tiles[y][x] == -1 || tiles[y][x] == 0) {
-            if(level.brickTiles[cacheKey(x,y)] != null) {
-              brickTiles[cacheKey(x,y)] = level.brickTiles[cacheKey(x,y)];
-              bricks.add(level.brickTiles[cacheKey(x,y)]);
+      var hasLaserAt:int = 0;
+      var parent:LevelGroup;
+      var parentFirst:LevelGroup = father;
+      var parentSecond:LevelGroup = mother;
+
+      parent = Math.random() < 0.5 ? mother : father;
+     
+      for(x = 0; x < 25; x++) {
+        //Roof
+        hasLaserAt = 0;
+        for(y = 0; y < 6; y++) {
+          if(tiles[y][x] == FEATURES.LASER) hasLaserAt = y;
+        }
+
+        if(hasLaserAt > 0) {
+          for(y = 0; y < hasLaserAt-2; y++) {
+            if(tiles[y][x] > 0) continue;
+            if(mother.brickTiles[cacheKey(x,y)] != null) {
+              brickTiles[cacheKey(x,y)] = mother.brickTiles[cacheKey(x,y)];
+              bricks.add(brickTiles[cacheKey(x,y)]);
             } else {
-              bgTiles[cacheKey(x,y)] = level.bgTiles[cacheKey(x,y)];
-              bg.add(level.bgTiles[cacheKey(x,y)]);
+              brickTiles[cacheKey(x,y)] = father.brickTiles[cacheKey(x,y)];
+              bricks.add(brickTiles[cacheKey(x,y)]);
+            }
+          }
+        } else {
+          for(y = 0; y < 6; y++) {
+            if(tiles[y][x] > 0) continue;
+            if(brickTiles[cacheKey(x,y-1)] != null || y == 0) {
+              parent = Math.random() < 0.5 ? mother : father;
+              if(parent.brickTiles[cacheKey(x,y-1)] != null || y == 0) {
+                brickTiles[cacheKey(x,y)] = parent.brickTiles[cacheKey(x,y)];
+                bricks.add(parent.brickTiles[cacheKey(x,y)]);
+              } else {
+                bgTiles[cacheKey(x,y)] = parent.bgTiles[cacheKey(x,y)];
+                bg.add(parent.bgTiles[cacheKey(x,y)]);
+              }
+            } else {
+              if(father.bgTiles[cacheKey(x,y)] != null) {
+                bgTiles[cacheKey(x,y)] = father.bgTiles[cacheKey(x,y)];
+                bg.add(father.bgTiles[cacheKey(x,y)]);
+              } else {
+                bgTiles[cacheKey(x,y)] = mother.bgTiles[cacheKey(x,y)];
+                bg.add(mother.bgTiles[cacheKey(x,y)]);
+              }
+            }
+          }
+        }
+
+        //Ground
+        for(y = 6; y < tiles.length; y++) {
+          if(tiles[y][x] > 0) continue;
+          if(Math.random() < 0.5) {
+            parentFirst = mother;
+            parentSecond = father;
+          } else {
+            parentFirst = father;
+            parentSecond = mother;
+          }
+
+          if(x >= tiles[0].length - 3) {
+            if(mother.brickTiles[cacheKey(x,y)] != null) {
+              brickTiles[cacheKey(x,y)] = mother.brickTiles[cacheKey(x,y)];
+              bricks.add(mother.brickTiles[cacheKey(x,y)]);
+              tiles[y][x] = FEATURES.WALL;
+            } else {
+              bgTiles[cacheKey(x,y)] = mother.bgTiles[cacheKey(x,y)];
+              bg.add(mother.bgTiles[cacheKey(x,y)]);
+            }
+          } else if(brickTiles[cacheKey(x,y-1)] != null) {
+            if(parentFirst.brickTiles[cacheKey(x,y)] != null) {
+              brickTiles[cacheKey(x,y)] = parentFirst.brickTiles[cacheKey(x,y)];
+              bricks.add(parentFirst.brickTiles[cacheKey(x,y)]);
+            } else {
+              brickTiles[cacheKey(x,y)] = parentSecond.brickTiles[cacheKey(x,y)];
+              bricks.add(parentSecond.brickTiles[cacheKey(x,y)]);
+            }
+          } else {
+            parent = Math.random() < 0.5 ? mother : father;
+            if(parent.brickTiles[cacheKey(x,y)] != null) {
+              brickTiles[cacheKey(x,y)] = parent.brickTiles[cacheKey(x,y)];
+              bricks.add(parent.brickTiles[cacheKey(x,y)]);
+            } else {
+              bgTiles[cacheKey(x,y)] = parent.bgTiles[cacheKey(x,y)];
+              bg.add(parent.bgTiles[cacheKey(x,y)]);
             }
           }
         }
       }
 
+      updateGoal();
       return this;
     }
 
@@ -247,19 +322,12 @@ package
       if(mother.pits.length < 1 && father.pits.length < 1) return;
       var motherPits:Array = mother.pits.concat();
       var fatherPits:Array = father.pits.concat();
-      var pitTotal:int = motherPits.length + fatherPits.length;
-      var numPits:int = Math.ceil(Math.random() * pitTotal);
+      var numPits:int = motherPits.length + fatherPits.length;
       var pit:Array;
       var parent:LevelGroup;
 
       motherPits.sort(randomSort);
       fatherPits.sort(randomSort);
-
-      var pitMin:int = G.generation - 1;
-      if(numPits < pitMin) {
-        if(pitTotal < pitMin) numPits = pitTotal;
-        else numPits = pitMin;
-      }
 
       for(var i:int = 0; i < numPits; i++) {
         if(motherPits.length == 0) {
@@ -277,6 +345,7 @@ package
         }
         if(pit == null) return;
         tileRange(pit[0]-1, tiles.length-7, pit[1] + 2, 7, function(x:int, y:int):void {
+          if(x > tiles[0].length - 4) return;
           if(tiles[y][x] != -1) return;
           tiles[y][x] = FEATURES.PIT;
           if(parent.brickTiles[cacheKey(x,y)]) {
