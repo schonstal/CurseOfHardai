@@ -131,12 +131,12 @@ package
           _landing = false;
         }
 
-        if(FlxG.keys.A) {
+        if(FlxG.keys.A || FlxG.keys.LEFT) {
           acceleration.x = -_speed.x * (velocity.x > 0 ? 4 : 1);
           offset.x = 1;
           facing = LEFT;
           playRunAnim();
-        } else if(FlxG.keys.D) {
+        } else if(FlxG.keys.D || FlxG.keys.RIGHT) {
           acceleration.x = _speed.x * (velocity.x < 0 ? 4 : 1);
           offset.x = 5;
           facing = RIGHT;
