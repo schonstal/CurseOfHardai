@@ -7,6 +7,8 @@ package
     public var player:Player;
     public var teleporter:TeleporterSprite;
 
+    public var goal:GoalSprite;
+
     private var levelGroup:LevelGroup;
 
     private var currentGeneration:Array;
@@ -16,6 +18,8 @@ package
     override public function create():void {
       currentGeneration = new Array();
       nextGeneration = new Array();
+
+      goal = new GoalSprite(22, 15);
 
       /*var motherGroup:LevelGroup = new LevelGroup(2);
       var fatherGroup:LevelGroup = new LevelGroup(0);
@@ -45,6 +49,8 @@ package
       add(teleporter);
 
       G.paused = true;
+      levelGroup.updateGoal();
+      add(goal);
 
       //FlxG.visualDebug = true;
     }
@@ -63,7 +69,7 @@ package
           tile.onCollide(player);
         });
 
-        FlxG.overlap(player, levelGroup.goal, function(player:Player, tile:TileSprite):void {
+        FlxG.overlap(player, goal, function(player:Player, tile:TileSprite):void {
           tile.onCollide(player);
         });
 
@@ -83,34 +89,34 @@ package
       var mother:LevelGroup = null;
       var father:LevelGroup = null;
       var baby:LevelGroup = null;
+      var chance:Number = 0.3;
 
       tempGeneration = new Array();
 
-      //currentGeneration.sortOn("fitness", Array.DESCENDING);
+      G.generation++;
+
+      currentGeneration.sortOn("fitness", Array.DESCENDING);
       
       for each(var level:LevelGroup in nextGeneration) {
-        /*while(mother == null) {
-          for(var i:int = 0; i < 9; i++) {
-            if(Math.random() < 0.2) {
-              mother = currentGeneration[i];
-              break;
-            }
+        mother = currentGeneration[0];
+        for(var i:int = 0; i < 8; i++) {
+          if(Math.random() < chance) {
+            mother = currentGeneration[i];
+            chance -= 0.03;
           }
         }
 
-        while(father == null || mother == father) {
-          for(var j:int = 0; j < 9; j++) {
-            if(Math.random() < 0.2) {
-              father = currentGeneration[i];
-              break;
-            }
-          }
-        }*/
-
-        mother = currentGeneration[0];
+        chance = 0.3;
+        
         father = currentGeneration[1];
+        for(var j:int = 0; j < 8; j++) {
+          if(Math.random() < chance) {
+            father = currentGeneration[i];
+            chance -= 0.03;
+          }
+        }
 
-        FlxG.log(mother == father);
+        if(father == null || mother == null) trace("PENIS");
 
         level.reproduce(mother, father);
       }
@@ -123,6 +129,7 @@ package
     public function die():void {
       G.paused = true;
       teleportIn();
+      levelGroup.fitness += 15;
       levelGroup.rebase();
     }
 
@@ -134,32 +141,36 @@ package
     
     public function teleportIn():void {
       remove(player);
+      levelGroup.updateGoal();
       teleporter.init(Player.START_X, Player.START_Y);
       teleporter.play("return", true);
     }
 
     public function startLevel():void {
-      FlxG.log("starting " + FlxG.level);
       player = new Player(Player.START_X, Player.START_Y);
       add(player);
       G.paused = false;
-      levelGroup.rebase();
     }
 
     public function endLevel():void {
-      FlxG.log("ending " + FlxG.level)
       FlxG.level++;
       if(FlxG.level <= 8) {
         remove(levelGroup);
+        remove(goal);
         levelGroup = currentGeneration[FlxG.level];
+        levelGroup.rebase();
         add(levelGroup);
+        add(goal);
         teleportIn();
       } else {
         remove(levelGroup);
+        remove(goal);
         FlxG.level = 0;
         mateLevels();
         levelGroup = currentGeneration[FlxG.level];
+        levelGroup.rebase();
         add(levelGroup);
+        add(goal);
         teleportIn();
       }
     }
